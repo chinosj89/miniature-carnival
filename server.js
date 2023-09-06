@@ -2,6 +2,15 @@ require('dotenv').config();
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
+
+const ascii = `███████ ███    ███ ██████  ██       ██████  ██    ██ ███████ ███████     ████████ ██████   █████   ██████ ██   ██ ███████ ██████       █████  ██████  ██████  
+██      ████  ████ ██   ██ ██      ██    ██  ██  ██  ██      ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██     ██   ██ ██   ██ ██   ██ 
+█████   ██ ████ ██ ██████  ██      ██    ██   ████   █████   █████          ██    ██████  ███████ ██      █████   █████   ██████      ███████ ██████  ██████  
+██      ██  ██  ██ ██      ██      ██    ██    ██    ██      ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██     ██   ██ ██      ██      
+███████ ██      ██ ██      ███████  ██████     ██    ███████ ███████        ██    ██   ██ ██   ██  ██████ ██   ██ ███████ ██   ██     ██   ██ ██      ██      
+                                                                                                                                                              
+                                                                                                                                                              `
+console.log(ascii);
 // mySQL connection
 const db = mysql.createConnection(
     {
@@ -18,7 +27,7 @@ function run() {
         {
             type: 'list',
             name: 'choice',
-            message: 'Select an option.',
+            message: 'What would you like to do?',
             choices: [
                 'View Employees',
                 'View Roles',
