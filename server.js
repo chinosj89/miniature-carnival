@@ -77,7 +77,7 @@ LEFT JOIN employee AS manager ON manager.id = employee.manager_id`;
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Employees:");
-        console.log(result);
+        console.table(result);
         run();
     })
 };
@@ -90,7 +90,7 @@ function viewDepartments() {
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Departments:");
-        console.log(result);
+        console.table(result);
         run();
     })
 };
@@ -104,7 +104,7 @@ function viewRoles() {
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Roles");
-        console.log(result);
+        console.table(result);
         run();
     })
 }
@@ -137,7 +137,7 @@ function newEmployee() {
             db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?)`,
                 [result.firstName, result.lastName, result.employeeRole, result.managerID], function (err, result) {
                     if (err) throw err;
-                    console.log('New employee added successfully.');
+                    console.table('New employee added successfully.');
                     run();
                 });
         });
@@ -166,7 +166,7 @@ function newRole() {
             [result.newRole, result.newRoleSalary, result.newRoleID], function (err, result) {
                 console.log(err)
                 if (err) throw err;
-                console.log(result);
+                console.table(result);
                 run();
             })
     })
@@ -181,19 +181,29 @@ function newDepartment() {
             message: 'Enter new department name.',
             name: 'newDepartment'
         },
-        {
-            type: 'input',
-            message: 'Enter new department ID for this new department.',
-            name: 'newDepartmentID'
-        }
     ])
         .then(function (result) {
-            db.query(`INSERT INTO department(name, roles_id) VALUES(?,?)`,
-                [result.newDepartment, result.newDepartmentID], function (err, result) {
-                    console.log(err)
-                    if (err) throw err
-                    console.log(result);
+            db.query(`INSERT INTO department(name) VALUES(?)`, [result.newDepartment], function (err, insertResult) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+
+                // Retrieve the inserted department from the database
+                db.query(`SELECT * FROM department WHERE id = ?`, [insertResult.insertId], function (err, departmentResult) {
+                    if (err) {
+                        console.log(err);
+                        throw err;
+                    }
+
+                    // Log the newly added department as a table
+                    console.log("New Department Added:");
+                    console.table(departmentResult);
+
                     run();
-                })
-        })
+                });
+            });
+        });
 }
+
+run();
