@@ -117,7 +117,7 @@ function newEmployee() {
 
     ])
         .then(function (result) {
-            db.query('INSERT INTO employees(first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?)',
+            db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?)`,
                 [result.firstName, result.lastName, result.employeeRole, result.managerID], function (err, result) {
                     if (err) throw err;
                     console.log('New employee added successfully.');
@@ -145,7 +145,7 @@ function newRole() {
             name: 'newRoleID'
         }
     ]).then(function (result) {
-        db.query('INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)',
+        db.query(`INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)`,
             [result.newRole, result.newRoleSalary, result.newRoleID], function (err, result) {
                 console.log(err)
                 if (err) throw err;
@@ -171,7 +171,7 @@ function newDepartment() {
         }
     ])
         .then(function (result) {
-            db.query('INSERT INTO department(department_name, roles_id) VALUES(?,?)',
+            db.query(`INSERT INTO department(department_name, roles_id) VALUES(?,?)`,
                 [result.newDepartment, result.newDepartmentID], function (err, result) {
                     console.log(err)
                     if (err) throw err
