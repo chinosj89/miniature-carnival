@@ -3,4 +3,5 @@ package-lock.json
 package.json
 .env
 testALLEmployees.sql
-addEmployee.sql
+newRole.sql
+newDept.sql

@@ -61,7 +61,19 @@ function run() {
 }
 // View Employees
 function viewEmployees() {
-    const request = `SELECT * FROM employees`;
+    const request = `SELECT 
+    employee.id AS 'Employee ID', 
+    employee.first_name AS 'First Name', 
+    employee.last_name AS 'Last Name',
+    role.title AS 'Job Title',
+    department.name AS 'Department',
+    role.salary AS 'Salary',
+    CONCAT(manager.first_name, ' ', manager.last_name) AS 'Manager'
+FROM 
+    employee
+LEFT JOIN role ON employee.role_id = role.id
+LEFT JOIN department ON role.department_id = department.id 
+LEFT JOIN employee AS manager ON manager.id = employee.manager_id`;
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Employees:");
@@ -72,7 +84,9 @@ function viewEmployees() {
 
 // View Departments
 function viewDepartments() {
-    const request = `SELECT * FROM department`;
+    const request = `SELECT 
+    id AS 'Department ID', 
+    name AS 'Department Name' FROM department`;
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Departments:");
@@ -83,7 +97,10 @@ function viewDepartments() {
 
 // View Roles
 function viewRoles() {
-    const request = `SELECT * FROM role`;
+    const request = `SELECT id AS 'Role ID', 
+    title AS ' Job Title', 
+    salary AS 'Salary', 
+    department_id AS 'Department ID' FROM role`;
     db.query(request, function (err, result) {
         if (err) throw err;
         console.log("Viewing All Roles");
@@ -171,7 +188,7 @@ function newDepartment() {
         }
     ])
         .then(function (result) {
-            db.query(`INSERT INTO department(department_name, roles_id) VALUES(?,?)`,
+            db.query(`INSERT INTO department(name, roles_id) VALUES(?,?)`,
                 [result.newDepartment, result.newDepartmentID], function (err, result) {
                     console.log(err)
                     if (err) throw err
