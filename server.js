@@ -32,39 +32,50 @@ function run() {
                 'View Employees',
                 'View Roles',
                 'View Departments',
+                'View by Deparment ID',
                 'Add New Employee',
                 'Add New Role',
                 'Add Department',
+                'Update Employee Role',
+                'Update Employee Manager',
+                'Delete an Employee',
+                'Delete a Role',
             ],
         }]).then((answer) => {
             switch (answer.choice) {
-
                 case 'View Employees':
-
                     viewEmployees();
                     break;
                 case 'View Roles':
-
                     viewRoles();
                     break;
                 case 'View Departments':
-
                     viewDepartments();
                     break;
+                case 'View by Deparment ID':
+                    viewByDept();
+                    break;
                 case 'Add New Employee':
-
                     newEmployee();
                     break;
                 case 'Add New Role':
-
                     newRole();
                     break;
-
                 case 'Add Department':
-
                     newDepartment();
                     break;
-
+                case 'Update Employee Role':
+                    updateRole();
+                    break;
+                case 'Update Employee Manager':
+                    updateManager();
+                    break;
+                case 'Delete an Employee':
+                    deleteEmployee();
+                    break;
+                case 'Delete a Role':
+                    deleteRole();
+                    break;
             }
         })
 }
@@ -103,6 +114,40 @@ function viewDepartments() {
         run();
     })
 };
+
+//Viewing by department id
+function viewByDept() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'Enter Department ID',
+            name: 'departmentID'
+        },
+       
+
+    ])
+        .then(function (result) {
+            db.query(`SELECT 
+            employee.id AS 'Employee ID', 
+            employee.first_name AS 'First Name', 
+            employee.last_name AS 'Last Name',
+            role.title AS 'Job Title',
+            department.name AS 'Department',
+            role.salary AS 'Salary',
+            CONCAT(manager.first_name, ' ', manager.last_name) AS 'Manager'
+        FROM 
+            employee
+        LEFT JOIN role ON employee.role_id = role.id
+        LEFT JOIN department ON role.department_id = department.id 
+        LEFT JOIN employee AS manager ON manager.id = employee.manager_id
+        WHERE department_id = ?;`,
+                [ result.departmentID], function (err, result) {
+                    if (err) throw err;
+                    console.table(result);
+                    run();
+                });
+        });
+}
 
 // View Roles
 function viewRoles() {
@@ -143,7 +188,7 @@ function newEmployee() {
 
     ])
         .then(function (result) {
-            db.query(`INSERT INTO employees(first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?)`,
+            db.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`,
                 [result.firstName, result.lastName, result.employeeRole, result.managerID], function (err, result) {
                     if (err) throw err;
                     console.table('New employee added successfully.');
@@ -171,7 +216,7 @@ function newRole() {
             name: 'newRoleID'
         }
     ]).then(function (result) {
-        db.query(`INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)`,
+        db.query(`INSERT INTO role(title, salary, department_id) VALUES (?,?,?)`,
             [result.newRole, result.newRoleSalary, result.newRoleID], function (err, result) {
                 console.log(err)
                 if (err) throw err;
@@ -190,29 +235,144 @@ function newDepartment() {
             message: 'Enter new department name.',
             name: 'newDepartment'
         },
-    ])
-        .then(function (result) {
-            db.query(`INSERT INTO department(name) VALUES(?)`, [result.newDepartment], function (err, insertResult) {
+    ]).then(function (result) {
+        db.query(`INSERT INTO department(name) VALUES(?)`, [result.newDepartment], function (err, insertResult) {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+
+            // Retrieve the inserted department from the database
+            db.query(`SELECT * FROM department WHERE id = ?`, [insertResult.insertId], function (err, departmentResult) {
                 if (err) {
                     console.log(err);
                     throw err;
                 }
 
-                // Retrieve the inserted department from the database
-                db.query(`SELECT * FROM department WHERE id = ?`, [insertResult.insertId], function (err, departmentResult) {
-                    if (err) {
-                        console.log(err);
-                        throw err;
-                    }
+                // Log the newly added department as a table
+                console.log("New Department Added:");
+                console.table(departmentResult);
 
-                    // Log the newly added department as a table
-                    console.log("New Department Added:");
-                    console.table(departmentResult);
-
-                    run();
-                });
+                run();
             });
         });
+    });
+}
+
+// UPDATE Employee role
+// tested in log - works
+function updateRole() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'Enter the first name of the employee you want to update:',
+            name: 'firstName'
+        },
+        {
+            type: 'input',
+            message: 'Enter the last name of the employee you want to update:',
+            name: 'lastName'
+        },
+        {
+            type: 'input',
+            message: 'Enter the new role ID for the employee:',
+            name: 'newRoleID'
+        },
+    ]).then(function (result) {
+        db.query(
+            `UPDATE employee SET role_id = ? WHERE first_name = ? AND last_name = ?`,
+            [result.newRoleID, result.firstName, result.lastName],
+            function (err, res) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('Employee role updated successfully.');
+                run();
+            })
+    })
+}
+//Update employee manager
+function updateManager() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'Enter the first name of the employee you want to update:',
+            name: 'firstName'
+        },
+        {
+            type: 'input',
+            message: 'Enter the last name of the employee you want to update:',
+            name: 'lastName'
+        },
+        {
+            type: 'input',
+            message: 'Enter the new manager ID for the employee:',
+            name: 'newManagerID'
+        },
+    ]).then(function (result) {
+        db.query(
+            `UPDATE employee SET manager_id = ? WHERE first_name = ? AND last_name = ?`,
+            [result.newManagerID, result.firstName, result.lastName],
+            function (err, res) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('Employee role updated successfully.');
+                run();
+            })
+    })
+}
+// Testing Delete - works
+function deleteEmployee() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'Enter the first name of the employee you want to update:',
+            name: 'firstName'
+        },
+        {
+            type: 'input',
+            message: 'Enter the last name of the employee you want to update:',
+            name: 'lastName'
+        },
+    ]).then(function (result) {
+        db.query(
+            `DELETE FROM employee WHERE first_name = ? AND last_name = ?`,
+            [result.firstName, result.lastName],
+            function (err, res) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('Employee succesfully deleted');
+                run();
+            })
+    })
+}
+// tested - works!
+function deleteRole() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What Role would you like to remove?',
+            name: 'deleteRole'
+        },
+        
+    ]).then(function (result) {
+        db.query(
+            `DELETE FROM role WHERE title = ?`,
+            [result.deleteRole],
+            function (err, res) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('Employee succesfully deleted');
+                run();
+            })
+    })
 }
 
 run();
