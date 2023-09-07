@@ -356,7 +356,7 @@ function deleteRole() {
     inquirer.prompt([
         {
             type: 'input',
-            message: 'What Role would you like to remove?',
+            message: 'What Role would you like to remove? Use Job Title name',
             name: 'deleteRole'
         },
         
@@ -369,7 +369,7 @@ function deleteRole() {
                     console.log(err);
                     return;
                 }
-                console.log('Employee succesfully deleted');
+                console.log('Role succesfully deleted');
                 run();
             })
     })
