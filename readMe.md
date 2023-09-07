@@ -16,7 +16,8 @@
   - [Tests](#tests)
   - [Questions](#questions)
   ## Demo
-  See Demo here: https://drive.google.com/file/d/1DgV9p5q-Kh2GRl97cR7tLjOWRAsxNhjo/view
+  See Demo here: https://drive.google.com/file/d/1DgV9p5q-Kh2GRl97cR7tLjOWRAsxNhjo/view <br />
+  if above link does not work: https://www.youtube.com/watch?v=juKbUQYbnU4
   ## Installation
   npm install, inquirer, and mysql2
   
